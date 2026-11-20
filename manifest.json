@@ -1,0 +1,21 @@
+{
+  "provides": "httplib",
+  "version": "0.1.0",
+  "authors": [ "Cristhian Gonzales Castillo <yo@gcca.dev>" ],
+  "langrev": "1",
+  "sources": [ "httplib.c3i", "httplib.c3" ],
+  "targets": {
+    "macos-aarch64": {
+      "linked-libraries": [ "httplibshim", "c++" ]
+    },
+    "macos-x64": {
+      "linked-libraries": [ "httplibshim", "c++" ]
+    },
+    "linux-x64": {
+      "linked-libraries": [ "httplibshim", "stdc++", "pthread" ]
+    },
+    "linux-aarch64": {
+      "linked-libraries": [ "httplibshim", "stdc++", "pthread" ]
+    }
+  }
+}

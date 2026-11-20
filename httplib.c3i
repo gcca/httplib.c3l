@@ -1,0 +1,68 @@
+module httplib;
+
+typedef Server = inline void*;
+typedef Request = inline void*;
+typedef Response = inline void*;
+
+alias Handler = fn void(Request request, Response response);
+
+struct NativeString
+{
+	char* ptr;
+	usz len;
+}
+
+extern fn Server server_create();
+
+extern fn void server_destroy(Server server);
+
+extern fn Server server_get(Server server, ZString pattern, Handler handler);
+
+extern fn Server server_post(Server server, ZString pattern, Handler handler);
+
+extern fn Server server_put(Server server, ZString pattern, Handler handler);
+
+extern fn Server server_delete(Server server, ZString pattern, Handler handler);
+
+extern fn void server_listen(Server server, ZString host, CInt port);
+
+extern fn CInt server_bind_any(Server server, ZString host);
+
+extern fn void server_listen_after_bind(Server server);
+
+extern fn void server_stop(Server server);
+
+extern fn CInt server_is_running(Server server);
+
+extern fn ZString request_path_param(Request request, ZString key);
+
+extern fn ZString request_param(Request request, ZString key);
+
+extern fn usz request_param_count(Request request);
+
+extern fn ZString request_param_key_at(Request request, usz index);
+
+extern fn ZString request_param_value_at(Request request, usz index);
+
+extern fn ZString request_header(Request request, ZString key);
+
+extern fn NativeString request_body(Request request);
+
+extern fn void response_set_redirect(Response response, ZString url);
+
+extern fn void response_set_content(Response response, char* s, usz n, ZString content_type);
+
+extern fn void response_set_header(Response response, ZString key, ZString value);
+
+extern fn void response_set_status(Response response, CInt status);
+
+extern fn void response_set_cookie(
+	Response response,
+	ZString name,
+	ZString value,
+	ZString path,
+	CInt max_age_s,
+	CInt http_only,
+	CInt secure,
+	ZString same_site
+);

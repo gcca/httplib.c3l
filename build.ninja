@@ -1,0 +1,39 @@
+builddir = build
+target = macos-aarch64
+cxx = clang++
+cxxflags = -std=c++23 -O2 -mmacosx-version-min=11.0 -I3rd
+
+rule cxx
+  command = $cxx $cxxflags -c $in -o $out
+  description = CXX $out
+
+rule ar
+  command = rm -f $out && ar rcs $out $in
+  description = AR $out
+
+rule libdir
+  command = mkdir -p $builddir/lib && ln -sfn ../.. $out
+  description = LINK $out
+
+rule c3_test_compile
+  command = c3c compile-test --suppress-run --libdir $builddir/lib --lib httplib --output-dir $builddir --build-dir $builddir --obj-out $builddir $in
+  description = BUILD httplib tests
+
+rule c3_test_run
+  command = $builddir/testrun
+  description = TEST httplib
+
+build $builddir/httplibshim.o: cxx 3rd/httplibshim.cpp | 3rd/httplibshim.hpp 3rd/httplib.h
+build $target/libhttplibshim.a: ar $builddir/httplibshim.o
+build lib: phony $target/libhttplibshim.a
+build $builddir/lib/httplib.c3l: libdir
+
+build $builddir/testrun: c3_test_compile tests/support_test.c3 $
+  tests/create_test.c3 $
+  tests/routes_test.c3 $
+  tests/request_test.c3 $
+  tests/response_test.c3 | httplib.c3 httplib.c3i manifest.json $target/libhttplibshim.a $builddir/lib/httplib.c3l
+build always: phony
+build test: c3_test_run $builddir/testrun | always
+
+default test
